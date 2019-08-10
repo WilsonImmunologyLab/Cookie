@@ -1,0 +1,24 @@
+Package: Cookie
+Type: Package
+Title: An unbiased sampling method to select representative samples from large population
+Version: 0.1.0
+Authors@R: c(
+  person(given = 'Lei', family = 'Li', email = 'leil@uchicago.edu', role = c('aut', 'cre'))
+  )
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: GPL-3 | file LICENSE
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 3.4.0)
+Imports: 
+    ggplot2,
+    cluster,
+    reshape2,
+    ggradar,
+    Rtsne,
+    umap,
+    Rcpp
+LinkingTo: Rcpp
+RoxygenNote: 6.1.1
