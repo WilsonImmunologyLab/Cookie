@@ -136,7 +136,7 @@ createCookieObject <- function(
       reduction = list(),
       sample.size.test = list(),
       samplings = list(),
-      version = packageVersion(pkg = 'Cookie')
+      version = as.character(packageVersion(pkg = 'Cookie'))
     )
   } else {
     stop("Please provide data and factor type")

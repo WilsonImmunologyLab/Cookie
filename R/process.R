@@ -18,7 +18,10 @@ normalization <- function (
     if(length(num.index) > 0) {
       for (index in num.index) {
         col <- raw.data[,index]
+        na.index <- which(col == "NA")
+        col[na.index] <- min(col)
         raw.data[,index] <- (col - min(col))/(max(col) - min(col))
+        raw.data[na.index,index] <- -1
       }
     } else {
       cat("Didn't find any numerical factor, will directly copy data from raw.data slot!\n")
@@ -54,12 +57,12 @@ distCalculation <- function (
       # bool and char matrix
       data2 <- data[,-num.index]
 
-      dist.matrix1 <- hammingCoding(data1)
-      dist.matrix2 <- binaryCoding(data2)
+      dist.matrix1 <- hammingCodingCpp(data1)
+      dist.matrix2 <- binaryCodingCpp(data2)
 
       dist.matrix <- dist.matrix1 + dist.matrix2
     } else {
-      dist.matrix <- binaryCoding(data)
+      dist.matrix <- binaryCodingCpp(data)
     }
 
     object@dist.matrix <- dist.matrix
@@ -127,7 +130,7 @@ hammingCoding <- function(
   m <- dim(data)[2]
   res <- matrix(0,n,n)
   for (i in 1:n) {
-    #cat("i = ", i, " \n")
+    cat("i = ", i, " \n")
     for (j in i:n) {
       #cat("j = ", j, " \n")
       vec.i <- data[i,]
