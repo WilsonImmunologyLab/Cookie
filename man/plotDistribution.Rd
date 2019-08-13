@@ -4,7 +4,8 @@
 \alias{plotDistribution}
 \title{plotDistribution}
 \usage{
-plotDistribution(object, sampling = "original", factor = NULL)
+plotDistribution(object, sampling = "original", factor = NULL,
+  label.display.cutoff = 0.02)
 }
 \arguments{
 \item{object}{Cookie object}
@@ -12,6 +13,8 @@ plotDistribution(object, sampling = "original", factor = NULL)
 \item{sampling}{choose original data or a specific sampling subset for analysis}
 
 \item{factor}{The factor for plot}
+
+\item{label.display.cutoff}{the lowest cutoff of fraction to display the}
 }
 \description{
 Plot coverage on each factor for a sampling

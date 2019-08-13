@@ -25,14 +25,19 @@ plotReduction <- function(
     if(!is.null(object@reduction[[reduction]])){
       data <- data.frame(dim1=object@reduction[[reduction]]@embedding[,1],dim2=object@reduction[[reduction]]@embedding[,2],id=rownames(object@raw.data))
       if(!is.null(group.factor)){
-        vector <- object@raw.data[,group.factor]
+        factor.list <- colnames(object@raw.data)
+        index <- which(factor.list == group.factor)
+        type <- object@factor.type[index]
+        if(type != "num"){
+          vector <- as.character(object@raw.data[,group.factor])
+        }
         data <- cbind(data,vector)
         colnames(data)[length(colnames(data))] <- "group"
       }
 
       if(!is.null(sampling)){
         vector <- object@samplings[[sampling]]@sampling
-        size <- rep(2, times=dim(vector)[1])
+        size <- rep(5, times=dim(vector)[1])
         levels(vector[,1]) <- c(levels(vector[,1]),"Unselected")
         size[is.na(vector[,1])] <- 1
         vector[is.na(vector[,1]),1] <- "Unselected"
@@ -43,11 +48,11 @@ plotReduction <- function(
       }
 
       if(!is.null(group.factor) && !is.null(sampling)) {
-        p <- ggplot(data = data, aes(x=dim1,y=dim2)) + geom_point(aes(shape=selected, color=group, size=size))
+        p <- ggplot(data = data, aes(x=dim1,y=dim2)) + geom_point(aes(shape=selected, color=group), size=size)
       } else if (!is.null(group.factor)) {
         p <- ggplot(data = data, aes(x=dim1,y=dim2)) + geom_point(aes(color=group))
       } else if (!is.null(sampling)) {
-        p <- ggplot(data = data, aes(x=dim1,y=dim2)) + geom_point(aes(shape=selected, size=size))
+        p <- ggplot(data = data, aes(x=dim1,y=dim2)) + geom_point(aes(shape=selected), size=size)
       } else {
         p <- ggplot(data = data, aes(x=dim1,y=dim2)) + geom_point()
       }
@@ -148,6 +153,7 @@ plotSampling <- function(
 #' @param object Cookie object
 #' @param sampling choose original data or a specific sampling subset for analysis
 #' @param factor The factor for plot
+#' @param label.display.cutoff the lowest cutoff of fraction to display the
 #'
 #' @importFrom ggplot2 ggplot aes geom_rect coord_polar theme_bw labs theme element_blank geom_text
 #'
@@ -157,7 +163,8 @@ plotSampling <- function(
 plotDistribution <- function(
   object,
   sampling = "original",
-  factor = NULL
+  factor = NULL,
+  label.display.cutoff = 0.02
 ) {
   if(is.null(factor)){
     stop("Please provide a factor name!")
@@ -184,7 +191,7 @@ plotDistribution <- function(
 
       for (n in 1:dim(plot.data)[1]) {
         cur <- plot.data[n,]
-        if(cur$fraction < 0.02) {
+        if(cur$fraction < label.display.cutoff) {
           plot.data$label[n] <- " "
         }
       }
@@ -207,4 +214,58 @@ plotDistribution <- function(
   } else {
     stop("Please provide a Cookie object!")
   }
+}
+
+
+#' A light theme for ggplot2 figures
+#'
+#' @importFrom ggplot2 ggplot aes_string geom_raster scale_fill_gradient aes element_rect element_line element_text theme margin
+#' @return A theme object
+#'
+#' @export
+
+LightTheme <- function(...) {
+  light.background <- element_rect(fill = 'white')
+  light.background.no.border <- element_rect(fill = 'white', size = 0)
+  font.margin <- 4
+  black.text <- element_text(
+    size = 20,
+    colour = 'black',
+    margin = margin(
+      t = font.margin,
+      r = font.margin,
+      b = font.margin,
+      l = font.margin
+    )
+  )
+  black.line <- element_line(colour = 'black', size = 1)
+  no.line <- element_line(size = 0)
+  #   Create the light theme
+  light.theme <- theme(
+    #   Set background colors
+    plot.background = light.background,
+    panel.background = light.background,
+    legend.background = light.background,
+    legend.box.background = light.background.no.border,
+    legend.key = light.background.no.border,
+    strip.background = element_rect(fill = 'grey50', colour = NA),
+    #   Set text colors
+    plot.title = black.text,
+    plot.subtitle = black.text,
+    axis.title = black.text,
+    axis.text = black.text,
+    legend.title = black.text,
+    legend.text = black.text,
+    strip.text = black.text,
+    #   Set line colors
+    axis.line.x = black.line,
+    axis.line.y = black.line,
+    panel.grid = no.line,
+    panel.grid.minor = no.line,
+    #   Validate the theme
+    validate = TRUE,
+    #   Extra parameters
+    ...
+  )
+  return(light.theme)
 }

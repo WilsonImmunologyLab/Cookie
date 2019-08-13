@@ -516,3 +516,34 @@ sampling <- function(
     stop("Please provide a Cookie object!")
   }
 }
+
+#' getSampling
+#'
+#' Get selected samples from a sampling
+#'
+#' @param object Cookie object
+#' @param name Name for a specific sampling run. e.g. run1
+#'
+#' @importFrom cluster pam
+#'
+#' @export
+#'
+
+getSampling <- function(
+  object = NULL,
+  name = NULL
+) {
+  if(!is.null(object)){
+    if(!is.null(object@samplings[[name]])){
+      data <- object@raw.data
+      sel <- object@samplings[[name]]@sampling
+      sel.index <- !is.na(sel[,1])
+      data <- data[sel.index,]
+      return(data)
+    } else {
+      stop("The factor name you provided does not exist!")
+    }
+  } else {
+    stop("Please provide a Cookie object!")
+  }
+}
