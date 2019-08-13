@@ -321,7 +321,8 @@ sampleSizeTest <- function(
       data <- object@normalize.data
       type <- object@factor.type
 
-      coverage <- matrix(data = NA, nrow = n.size, ncol = (n.factor + 1))
+      coverage <- matrix(data = 0, nrow = n.size, ncol = (n.factor + 1))
+      coveragecc <- matrix(data = 0, nrow = n.size, ncol = (n.factor + 1))
       selection <- matrix(data = NA, nrow = n.sample, ncol = n.size)
 
       if(!is.null(prime.factor)) {
@@ -349,6 +350,7 @@ sampleSizeTest <- function(
             a <- selection[,i]
             index.a <- which(!is.na(a))
             subset <- data[index.a,]
+
             coverage[i,1] = n
             for (j in 1:n.factor) {
               if(type[j] != "num") {
@@ -357,6 +359,49 @@ sampleSizeTest <- function(
                 coverage[i,(j+1)] <- length(unique(floor(subset[,j]*10)))/length(unique(floor(data[,j]*10)))
               }
             }
+
+            coveragecc[i,1] = n
+            for (j in 1:n.factor) {
+              if(type[j] != "num") {
+                population <- as.data.frame(table(data[,j]))
+                population$Var1 <- as.character(population$Var1)
+                samples <- as.data.frame(table(subset[,j]))
+                samples$Var1 <- as.character(samples$Var1)
+
+                tmp <- rep(0,dim(population)[1])
+                for (k in 1:dim(samples)[1]) {
+                  index <- which(population$Var1 == samples$Var1[k])
+                  tmp[index] <- samples$Freq[k]
+                }
+                population$FreqSel <- tmp
+                if(is.na(cor(population$FreqSel, population$Freq))) {
+                  coveragecc[i,(j+1)] <- 0
+                } else {
+                  coveragecc[i,(j+1)] <- cor(population$FreqSel, population$Freq)
+                }
+
+              } else {
+                a <- floor(subset[,j]*10)
+                b <- floor(data[,j]*10)
+
+                population <- as.data.frame(table(b))
+                samples <- as.data.frame(table(a))
+
+                tmp <- rep(0,dim(population)[1])
+                for (k in 1:dim(samples)[1]) {
+                  index <- which(population$Var1 == samples$Var1[k])
+                  tmp[index] <- samples$Freq[k]
+                }
+                population$FreqSel <- tmp
+
+                if(is.na(cor(population$FreqSel, population$Freq))) {
+                  coveragecc[i,(j+1)] <- 0
+                } else {
+                  coveragecc[i,(j+1)] <- cor(population$FreqSel, population$Freq)
+                }
+              }
+            }
+
             i <- i + 1
           }
         } else {
@@ -371,11 +416,55 @@ sampleSizeTest <- function(
           selection[res[["id.med"]],i] <- "Selected"
 
           subset <- data[res[["id.med"]],]
+
+          coverage[i,1] = n
           for (j in 1:n.factor) {
             if(type[j] != "num") {
-              coverage[i,j] <- length(unique(subset[,j]))/length(unique(data[,j]))
+              coverage[i,(j+1)] <- length(unique(subset[,j]))/length(unique(data[,j]))
             } else {
-              coverage[i,j] <- length(unique(floor(subset[,j]*10)))/length(unique(floor(data[,j]*10)))
+              coverage[i,(j+1)] <- length(unique(floor(subset[,j]*10)))/length(unique(floor(data[,j]*10)))
+            }
+          }
+
+          coveragecc[i,1] = n
+          for (j in 1:n.factor) {
+            if(type[j] != "num") {
+              population <- as.data.frame(table(data[,j]))
+              population$Var1 <- as.character(population$Var1)
+              samples <- as.data.frame(table(subset[,j]))
+              samples$Var1 <- as.character(samples$Var1)
+
+              tmp <- rep(0,dim(population)[1])
+              for (k in 1:dim(samples)[1]) {
+                index <- which(population$Var1 == samples$Var1[k])
+                tmp[index] <- samples$Freq[k]
+              }
+              population$FreqSel <- tmp
+
+              if(is.na(cor(population$FreqSel, population$Freq))) {
+                coveragecc[i,(j+1)] <- 0
+              } else {
+                coveragecc[i,(j+1)] <- cor(population$FreqSel, population$Freq)
+              }
+            } else {
+              a <- floor(subset[,j]*10)
+              b <- floor(data[,j]*10)
+
+              population <- as.data.frame(table(b))
+              samples <- as.data.frame(table(a))
+
+              tmp <- rep(0,dim(population)[1])
+              for (k in 1:dim(samples)[1]) {
+                index <- which(population$Var1 == samples$Var1[k])
+                tmp[index] <- samples$Freq[k]
+              }
+              population$FreqSel <- tmp
+
+              if(is.na(cor(population$FreqSel, population$Freq))) {
+                coveragecc[i,(j+1)] <- 0
+              } else {
+                coveragecc[i,(j+1)] <- cor(population$FreqSel, population$Freq)
+              }
             }
           }
           i <- i + 1
@@ -385,11 +474,18 @@ sampleSizeTest <- function(
       rownames(coverage) <- size.range
       colnames(coverage) <- c("Size",colnames(data))
 
+      coveragecc <- as.data.frame(coveragecc)
+      rownames(coveragecc) <- size.range
+      colnames(coveragecc) <- c("Size",colnames(data))
+
       selection <- as.data.frame(selection)
       rownames(selection) <- rownames(data)
       colnames(selection) <- size.range
 
-      object@sample.size.test[[name]] <- createSampleSizeTestObject(prime.factor = prime.factor,coverage = coverage,selection = selection)
+      if(is.null(prime.factor)){
+        prime.factor <- "NA"
+      }
+      object@sample.size.test[[name]] <- createSampleSizeTestObject(prime.factor = prime.factor,coverage = coverage,selection = selection, coveragecc = coveragecc)
       return(object)
     } else {
       stop("Please provide a name for this test (e.g. test1)!")
@@ -431,7 +527,8 @@ sampling <- function(
       data <- object@normalize.data
       type <- object@factor.type
 
-      coverage <- matrix(data = NA, nrow = 1, ncol = (n.factor + 1))
+      coverage <- matrix(data = 0, nrow = 1, ncol = (n.factor + 1))
+      coveragecc <- matrix(data = 0, nrow = 1, ncol = (n.factor + 1))
       selection <- matrix(data = NA, nrow = n.sample, ncol = 1)
       # step 1
       if(!is.null(prime.factor)) {
@@ -465,7 +562,7 @@ sampling <- function(
       # step 2
       index.a <- which(!is.na(selection))
       subset <- data[index.a,]
-      if(!is.na(important.factor)) {
+      if(!is.null(important.factor)) {
         for (important in important.factor) {
           original.important <- unique(data[,important])
           cur.important <- unique(subset[,important])
@@ -499,15 +596,66 @@ sampling <- function(
         }
       }
 
+      coveragecc[1,1] = sample.size
+      for (j in 1:n.factor) {
+        if(type[j] != "num") {
+          population <- as.data.frame(table(data[,j]))
+          population$Var1 <- as.character(population$Var1)
+          samples <- as.data.frame(table(subset[,j]))
+          samples$Var1 <- as.character(samples$Var1)
+
+          tmp <- rep(0,dim(population)[1])
+          for (k in 1:dim(samples)[1]) {
+            index <- which(population$Var1 == samples$Var1[k])
+            tmp[index] <- samples$Freq[k]
+          }
+          population$FreqSel <- tmp
+
+          if(is.na(cor(population$FreqSel, population$Freq))) {
+            coveragecc[1,(j+1)] <- 0
+          } else {
+            coveragecc[1,(j+1)] <- cor(population$FreqSel, population$Freq)
+          }
+        } else {
+          a <- floor(subset[,j]*10)
+          b <- floor(data[,j]*10)
+
+          population <- as.data.frame(table(b))
+          samples <- as.data.frame(table(a))
+
+          tmp <- rep(0,dim(population)[1])
+          for (k in 1:dim(samples)[1]) {
+            index <- which(population$Var1 == samples$Var1[k])
+            tmp[index] <- samples$Freq[k]
+          }
+          population$FreqSel <- tmp
+
+          if(is.na(cor(population$FreqSel, population$Freq))) {
+            coveragecc[1,(j+1)] <- 0
+          } else {
+            coveragecc[1,(j+1)] <- cor(population$FreqSel, population$Freq)
+          }
+        }
+      }
+
       coverage <- as.data.frame(coverage)
       rownames(coverage) <- sample.size
       colnames(coverage) <- c("Size",colnames(data))
 
+      coveragecc <- as.data.frame(coveragecc)
+      rownames(coveragecc) <- sample.size
+      colnames(coveragecc) <- c("Size",colnames(data))
+
       selection <- as.data.frame(selection)
       rownames(selection) <- rownames(data)
       colnames(selection) <- sample.size
-
-      object@samplings[[name]] <- createSamplingObject(prime.factor = prime.factor,important.factor = important.factor, coverage = coverage, sampling = selection, size = sample.size)
+      if(is.null(prime.factor)){
+        prime.factor <- "NA"
+      }
+      if(is.null(important.factor)){
+        important.factor <- "NA"
+      }
+      object@samplings[[name]] <- createSamplingObject(prime.factor = prime.factor,important.factor = important.factor, coverage = coverage, sampling = selection, size = sample.size, coveragecc = coveragecc)
       return(object)
     } else {
       stop("Please provide a name for this test (e.g. test1)!")

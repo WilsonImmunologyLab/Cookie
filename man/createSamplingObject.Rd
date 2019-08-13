@@ -5,7 +5,7 @@
 \title{Create a Sampling object}
 \usage{
 createSamplingObject(prime.factor = NULL, important.factor = NULL,
-  size = NULL, sampling = NULL, coverage = NULL)
+  size = NULL, sampling = NULL, coverage = NULL, coveragecc = NULL)
 }
 \arguments{
 \item{prime.factor}{Prime factor}

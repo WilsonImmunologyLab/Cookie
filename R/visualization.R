@@ -73,8 +73,9 @@ plotReduction <- function(
 #' Plot coverage on each factor for a size test to determine an appropriate sample size
 #'
 #' @param object Cookie object
-#' @param type Figure type, could be "radar" or "line"
+#' @param chart.type Figure type, could be "radar" or "line"
 #' @param test.name The name for a size test
+#' @param coverage.type users can choose "pct" or "cc"
 #'
 #' @importFrom ggplot2 ggplot geom_point aes geom_line theme labs ylab xlab scale_x_continuous theme_bw
 #' @importFrom reshape2 melt
@@ -85,16 +86,22 @@ plotReduction <- function(
 
 plotSizeTest <- function(
   object,
-  type = "line",
-  test.name = NULL
+  chart.type = "line",
+  test.name = NULL,
+  coverage.type = "pct"
 ) {
   if(is.null(test.name)){
     stop("Please provide a size test name!")
   }
   if(!is.null(object)){
     if(!is.null(object@sample.size.test[[test.name]])){
-      data <- object@sample.size.test[[test.name]]@coverage
-      if(type == "radar") {
+      if(coverage.type == "pct") {
+        data <- object@sample.size.test[[test.name]]@coverage
+      } else {
+        data <- object@sample.size.test[[test.name]]@coveragecc
+      }
+
+      if(chart.type == "radar") {
         p <- ggradar(data)
       } else {
         melt.data <- melt(data, id.vars = "Size")
@@ -118,6 +125,7 @@ plotSizeTest <- function(
 #'
 #' @param object Cookie object
 #' @param name The name for a size test
+#' @param coverage.type users can choose "pct" or "cc"
 #'
 #' @importFrom ggradar ggradar
 #'
@@ -126,14 +134,20 @@ plotSizeTest <- function(
 
 plotSampling <- function(
   object,
-  name = NULL
+  name = NULL,
+  coverage.type = "pct"
 ) {
   if(is.null(name)){
     stop("Please provide a size test name!")
   }
   if(!is.null(object)){
     if(!is.null(object@samplings[[name]])){
-      data <- object@samplings[[name]]@coverage
+      if(coverage.type == "pct") {
+        data <- object@samplings[[name]]@coverage
+      } else {
+        data <- object@samplings[[name]]@coveragecc
+      }
+
       p <- ggradar(data)
       return(p)
     } else {

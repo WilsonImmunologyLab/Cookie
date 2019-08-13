@@ -5,7 +5,7 @@
 \title{Create a SampleSizeTest object}
 \usage{
 createSampleSizeTestObject(prime.factor = NULL, coverage = NULL,
-  selection = NULL)
+  selection = NULL, coveragecc = NULL)
 }
 \arguments{
 \item{prime.factor}{Prime factor}

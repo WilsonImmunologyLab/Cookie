@@ -4,12 +4,14 @@
 \alias{plotSampling}
 \title{plotSampling}
 \usage{
-plotSampling(object, name = NULL)
+plotSampling(object, name = NULL, coverage.type = "pct")
 }
 \arguments{
 \item{object}{Cookie object}
 
 \item{name}{The name for a size test}
+
+\item{coverage.type}{users can choose "pct" or "cc"}
 }
 \description{
 Plot coverage on each factor for a sampling

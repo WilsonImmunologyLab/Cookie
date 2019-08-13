@@ -4,14 +4,17 @@
 \alias{plotSizeTest}
 \title{plotSizeTest}
 \usage{
-plotSizeTest(object, type = "line", test.name = NULL)
+plotSizeTest(object, chart.type = "line", test.name = NULL,
+  coverage.type = "pct")
 }
 \arguments{
 \item{object}{Cookie object}
 
-\item{type}{Figure type, could be "radar" or "line"}
+\item{chart.type}{Figure type, could be "radar" or "line"}
 
 \item{test.name}{The name for a size test}
+
+\item{coverage.type}{users can choose "pct" or "cc"}
 }
 \description{
 Plot coverage on each factor for a size test to determine an appropriate sample size

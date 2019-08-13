@@ -66,7 +66,8 @@ SampleSizeTest <- setClass(
   slots = c(
     prime.factor = 'character',
     coverage = 'data.frame',
-    selection = 'data.frame'
+    selection = 'data.frame',
+    coveragecc = 'data.frame'
   )
 )
 
@@ -91,7 +92,8 @@ Sampling <- setClass(
     important.factor = 'character',
     size = 'numeric',
     sampling = 'data.frame',
-    coverage = 'data.frame'
+    coverage = 'data.frame',
+    coveragecc = 'data.frame'
   )
 )
 
@@ -187,13 +189,15 @@ createDimReductionObject <- function(
 createSampleSizeTestObject <- function(
   prime.factor = NULL,
   coverage = NULL,
-  selection = NULL
+  selection = NULL,
+  coveragecc = NULL
 ) {
   object <- new(
     Class = 'SampleSizeTest',
     prime.factor = prime.factor,
     coverage = coverage,
-    selection = selection
+    selection = selection,
+    coveragecc = coveragecc
   )
   return(object)
 }
@@ -217,7 +221,8 @@ createSamplingObject <- function(
   important.factor = NULL,
   size = NULL,
   sampling = NULL,
-  coverage = NULL
+  coverage = NULL,
+  coveragecc = NULL
 ) {
   object <- new(
     Class = 'Sampling',
@@ -225,7 +230,8 @@ createSamplingObject <- function(
     important.factor = important.factor,
     size = size,
     sampling = sampling,
-    coverage = coverage
+    coverage = coverage,
+    coveragecc = coveragecc
   )
   return(object)
 }
