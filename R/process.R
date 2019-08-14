@@ -695,3 +695,241 @@ getSampling <- function(
     stop("Please provide a Cookie object!")
   }
 }
+
+
+#' simpleRandomSampling
+#'
+#' Simple Random Sampling from current dataset
+#'
+#' @param object Cookie object
+#' @param sample.size Sample size
+#' @param name A name for this run. e.g. test1
+#'
+#'
+#' @export
+#'
+
+simpleRandomSampling <- function(
+  object = NULL,
+  sample.size = NULL,
+  name = NULL
+) {
+  if(!is.null(object)){
+    if(!is.null(name)) {
+      n.sample <- dim(object@normalize.data)[1]
+      n.factor <- dim(object@normalize.data)[2]
+      dist.matrix <- object@dist.matrix
+      data <- object@normalize.data
+      type <- object@factor.type
+
+      coverage <- matrix(data = 0, nrow = 1, ncol = (n.factor + 1))
+      coveragecc <- matrix(data = 0, nrow = 1, ncol = (n.factor + 1))
+      selection <- matrix(data = NA, nrow = n.sample, ncol = 1)
+
+      index <- sample(1:n.sample,size = sample.size, replace = FALSE)
+      selection[index,1] <- "Selected"
+
+      # summary
+      a <- selection[,1]
+      index.a <- which(!is.na(a))
+      subset <- data[index.a,]
+      coverage[1,1] <- sample.size
+      for (j in 1:n.factor) {
+        if(type[j] != "num") {
+          coverage[1,(j+1)] <- length(unique(subset[,j]))/length(unique(data[,j]))
+        } else {
+          coverage[1,(j+1)] <- length(unique(floor(subset[,j]*10)))/length(unique(floor(data[,j]*10)))
+        }
+      }
+
+      coveragecc[1,1] = sample.size
+      for (j in 1:n.factor) {
+        if(type[j] != "num") {
+          population <- as.data.frame(table(data[,j]))
+          population$Var1 <- as.character(population$Var1)
+          samples <- as.data.frame(table(subset[,j]))
+          samples$Var1 <- as.character(samples$Var1)
+
+          tmp <- rep(0,dim(population)[1])
+          for (k in 1:dim(samples)[1]) {
+            index <- which(population$Var1 == samples$Var1[k])
+            tmp[index] <- samples$Freq[k]
+          }
+          population$FreqSel <- tmp
+
+          if(is.na(cor(population$FreqSel, population$Freq))) {
+            coveragecc[1,(j+1)] <- 0
+          } else {
+            coveragecc[1,(j+1)] <- cor(population$FreqSel, population$Freq)
+          }
+        } else {
+          a <- floor(subset[,j]*10)
+          b <- floor(data[,j]*10)
+
+          population <- as.data.frame(table(b))
+          samples <- as.data.frame(table(a))
+
+          tmp <- rep(0,dim(population)[1])
+          for (k in 1:dim(samples)[1]) {
+            index <- which(population$Var1 == samples$Var1[k])
+            tmp[index] <- samples$Freq[k]
+          }
+          population$FreqSel <- tmp
+
+          if(is.na(cor(population$FreqSel, population$Freq))) {
+            coveragecc[1,(j+1)] <- 0
+          } else {
+            coveragecc[1,(j+1)] <- cor(population$FreqSel, population$Freq)
+          }
+        }
+      }
+
+      coverage <- as.data.frame(coverage)
+      rownames(coverage) <- sample.size
+      colnames(coverage) <- c("Size",colnames(data))
+
+      coveragecc <- as.data.frame(coveragecc)
+      rownames(coveragecc) <- sample.size
+      colnames(coveragecc) <- c("Size",colnames(data))
+
+      selection <- as.data.frame(selection)
+      rownames(selection) <- rownames(data)
+      colnames(selection) <- sample.size
+
+      object@samplings[[name]] <- createSamplingObject(prime.factor = "NA",important.factor = "NA", coverage = coverage, sampling = selection, size = sample.size, coveragecc = coveragecc)
+      return(object)
+    } else {
+      stop("Please provide a name for this test (e.g. test1)!")
+    }
+  } else {
+    stop("Please provide a Cookie object!")
+  }
+}
+
+
+#' stratifiedSampling
+#'
+#' Stratified Sampling from current dataset
+#'
+#' @param object Cookie object
+#' @param sample.size Sample size
+#' @param prime.factor The unique prime factor.
+#' @param name A name for this run. e.g. test1
+#'
+#'
+#' @export
+#'
+
+stratifiedSampling <- function(
+  object = NULL,
+  prime.factor = NULL,
+  sample.size = NULL,
+  name = NULL
+) {
+  if(!is.null(object)){
+    if(!is.null(name)) {
+      n.sample <- dim(object@normalize.data)[1]
+      n.factor <- dim(object@normalize.data)[2]
+      dist.matrix <- object@dist.matrix
+      data <- object@normalize.data
+      type <- object@factor.type
+
+      coverage <- matrix(data = 0, nrow = 1, ncol = (n.factor + 1))
+      coveragecc <- matrix(data = 0, nrow = 1, ncol = (n.factor + 1))
+      selection <- matrix(data = NA, nrow = n.sample, ncol = 1)
+
+      # sampling from each level of prime factor
+      factors <- colnames(object@normalize.data)
+      if(prime.factor %in% factors) {
+        subject.list <- unique(data[,prime.factor])
+
+        for (subject in subject.list) {
+          index <- which(data[,prime.factor] == subject)
+          if(length(index) > sample.size) {
+            sub.index <- sample(index,size = sample.size, replace = FALSE)
+            selection[sub.index,1] <- "Selected"
+          } else {
+            cat("Number of samples in current subject = ",subject," is less than n = ",sample.size,", will select all samples in this subject!\n")
+            selection[index,1] <- "Selected"
+          }
+        }
+      } else {
+        stop("The prime factor you provided is not exist! Please check your input!")
+      }
+
+      # summary
+      a <- selection[,1]
+      index.a <- which(!is.na(a))
+      subset <- data[index.a,]
+      coverage[1,1] <- sample.size
+      for (j in 1:n.factor) {
+        if(type[j] != "num") {
+          coverage[1,(j+1)] <- length(unique(subset[,j]))/length(unique(data[,j]))
+        } else {
+          coverage[1,(j+1)] <- length(unique(floor(subset[,j]*10)))/length(unique(floor(data[,j]*10)))
+        }
+      }
+
+      coveragecc[1,1] = sample.size
+      for (j in 1:n.factor) {
+        if(type[j] != "num") {
+          population <- as.data.frame(table(data[,j]))
+          population$Var1 <- as.character(population$Var1)
+          samples <- as.data.frame(table(subset[,j]))
+          samples$Var1 <- as.character(samples$Var1)
+
+          tmp <- rep(0,dim(population)[1])
+          for (k in 1:dim(samples)[1]) {
+            index <- which(population$Var1 == samples$Var1[k])
+            tmp[index] <- samples$Freq[k]
+          }
+          population$FreqSel <- tmp
+
+          if(is.na(cor(population$FreqSel, population$Freq))) {
+            coveragecc[1,(j+1)] <- 0
+          } else {
+            coveragecc[1,(j+1)] <- cor(population$FreqSel, population$Freq)
+          }
+        } else {
+          a <- floor(subset[,j]*10)
+          b <- floor(data[,j]*10)
+
+          population <- as.data.frame(table(b))
+          samples <- as.data.frame(table(a))
+
+          tmp <- rep(0,dim(population)[1])
+          for (k in 1:dim(samples)[1]) {
+            index <- which(population$Var1 == samples$Var1[k])
+            tmp[index] <- samples$Freq[k]
+          }
+          population$FreqSel <- tmp
+
+          if(is.na(cor(population$FreqSel, population$Freq))) {
+            coveragecc[1,(j+1)] <- 0
+          } else {
+            coveragecc[1,(j+1)] <- cor(population$FreqSel, population$Freq)
+          }
+        }
+      }
+
+      coverage <- as.data.frame(coverage)
+      rownames(coverage) <- sample.size
+      colnames(coverage) <- c("Size",colnames(data))
+
+      coveragecc <- as.data.frame(coveragecc)
+      rownames(coveragecc) <- sample.size
+      colnames(coveragecc) <- c("Size",colnames(data))
+
+      selection <- as.data.frame(selection)
+      rownames(selection) <- rownames(data)
+      colnames(selection) <- sample.size
+
+      object@samplings[[name]] <- createSamplingObject(prime.factor = prime.factor,important.factor = "NA", coverage = coverage, sampling = selection, size = sample.size, coveragecc = coveragecc)
+      return(object)
+    } else {
+      stop("Please provide a name for this test (e.g. test1)!")
+    }
+  } else {
+    stop("Please provide a Cookie object!")
+  }
+}
