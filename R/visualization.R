@@ -30,6 +30,8 @@ plotReduction <- function(
         type <- object@factor.type[index]
         if(type != "num"){
           vector <- as.character(object@raw.data[,group.factor])
+        } else {
+          vector <- object@raw.data[,group.factor]
         }
         data <- cbind(data,vector)
         colnames(data)[length(colnames(data))] <- "group"
