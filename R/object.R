@@ -129,6 +129,15 @@ createCookieObject <- function(
       stop()
     }
 
+    # convert data format to "character" for all bool and char factors to accelerate the distance calculation
+    for (i in 1:length(factor.type)) {
+      if(factor.type[i] %in% c("bool","char")){
+        data[,i] <- as.character(data[,i])
+      } else {
+        data[,i] <- as.numeric(data[,i])
+      }
+    }
+
     object <- new(
       Class = 'Cookie',
       raw.data = data,
