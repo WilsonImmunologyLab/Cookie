@@ -66,8 +66,7 @@ SampleSizeTest <- setClass(
   slots = c(
     prime.factor = 'character',
     coverage = 'data.frame',
-    selection = 'data.frame',
-    coveragecc = 'data.frame'
+    selection = 'data.frame'
   )
 )
 
@@ -198,15 +197,13 @@ createDimReductionObject <- function(
 createSampleSizeTestObject <- function(
   prime.factor = NULL,
   coverage = NULL,
-  selection = NULL,
-  coveragecc = NULL
+  selection = NULL
 ) {
   object <- new(
     Class = 'SampleSizeTest',
     prime.factor = prime.factor,
     coverage = coverage,
-    selection = selection,
-    coveragecc = coveragecc
+    selection = selection
   )
   return(object)
 }

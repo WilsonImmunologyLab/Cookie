@@ -255,43 +255,6 @@ reductionUMAP <- function(
 }
 
 
-#' reductionMDS
-#'
-#' Run Classical MDS to project samples into 2D space using pairwise distances
-#'
-#' @param object Cookie object
-#' @param eig Indicates whether eigenvalues should be returned.
-#' @param k The maximum dimension of the space which the data are to be represented in; must be in {1, 2, …, n-1}.
-#' @param add Logical indicating if an additive constant c* should be computed, and added to the non-diagonal dissimilarities such that the modified dissimilarities are Euclidean.
-#' @param x.ret Indicates whether the doubly centred symmetric distance matrix should be returned.
-#'
-#' @export
-#'
-
-reductionMDS <- function(
-  object,
-  eig = FALSE,
-  k = 2,
-  add = FALSE,
-  x.ret = FALSE
-) {
-  if(!is.null(object)){
-    cat("Start run Classical MDS from distances...\n")
-
-    data <- object@dist.matrix
-
-    # run tsne with pairwise distances
-    my.mds <- cmdscale(data,eig=eig, k=k,add=add, x.ret = x.ret)
-    my.mds <- as.matrix(my.mds)
-    object@reduction[['cmds']] <- createDimReductionObject(data = my.mds, method = "Classical MDS")
-    return(object)
-  } else {
-    stop("Please provide a Cookie object!")
-  }
-}
-
-
-
 #' sampleSizeTest
 #'
 #' Run sample size test for current dataset
@@ -359,49 +322,6 @@ sampleSizeTest <- function(
                 coverage[i,(j+1)] <- length(unique(floor(subset[,j]*10)))/length(unique(floor(data[,j]*10)))
               }
             }
-
-            coveragecc[i,1] = n
-            for (j in 1:n.factor) {
-              if(type[j] != "num") {
-                population <- as.data.frame(table(data[,j]))
-                population$Var1 <- as.character(population$Var1)
-                samples <- as.data.frame(table(subset[,j]))
-                samples$Var1 <- as.character(samples$Var1)
-
-                tmp <- rep(0,dim(population)[1])
-                for (k in 1:dim(samples)[1]) {
-                  index <- which(population$Var1 == samples$Var1[k])
-                  tmp[index] <- samples$Freq[k]
-                }
-                population$FreqSel <- tmp
-                if(is.na(cor(population$FreqSel, population$Freq))) {
-                  coveragecc[i,(j+1)] <- 0
-                } else {
-                  coveragecc[i,(j+1)] <- cor(population$FreqSel, population$Freq)
-                }
-
-              } else {
-                a <- floor(subset[,j]*10)
-                b <- floor(data[,j]*10)
-
-                population <- as.data.frame(table(b))
-                samples <- as.data.frame(table(a))
-
-                tmp <- rep(0,dim(population)[1])
-                for (k in 1:dim(samples)[1]) {
-                  index <- which(population$Var1 == samples$Var1[k])
-                  tmp[index] <- samples$Freq[k]
-                }
-                population$FreqSel <- tmp
-
-                if(is.na(cor(population$FreqSel, population$Freq))) {
-                  coveragecc[i,(j+1)] <- 0
-                } else {
-                  coveragecc[i,(j+1)] <- cor(population$FreqSel, population$Freq)
-                }
-              }
-            }
-
             i <- i + 1
           }
         } else {
@@ -425,58 +345,12 @@ sampleSizeTest <- function(
               coverage[i,(j+1)] <- length(unique(floor(subset[,j]*10)))/length(unique(floor(data[,j]*10)))
             }
           }
-
-          coveragecc[i,1] = n
-          for (j in 1:n.factor) {
-            if(type[j] != "num") {
-              population <- as.data.frame(table(data[,j]))
-              population$Var1 <- as.character(population$Var1)
-              samples <- as.data.frame(table(subset[,j]))
-              samples$Var1 <- as.character(samples$Var1)
-
-              tmp <- rep(0,dim(population)[1])
-              for (k in 1:dim(samples)[1]) {
-                index <- which(population$Var1 == samples$Var1[k])
-                tmp[index] <- samples$Freq[k]
-              }
-              population$FreqSel <- tmp
-
-              if(is.na(cor(population$FreqSel, population$Freq))) {
-                coveragecc[i,(j+1)] <- 0
-              } else {
-                coveragecc[i,(j+1)] <- cor(population$FreqSel, population$Freq)
-              }
-            } else {
-              a <- floor(subset[,j]*10)
-              b <- floor(data[,j]*10)
-
-              population <- as.data.frame(table(b))
-              samples <- as.data.frame(table(a))
-
-              tmp <- rep(0,dim(population)[1])
-              for (k in 1:dim(samples)[1]) {
-                index <- which(population$Var1 == samples$Var1[k])
-                tmp[index] <- samples$Freq[k]
-              }
-              population$FreqSel <- tmp
-
-              if(is.na(cor(population$FreqSel, population$Freq))) {
-                coveragecc[i,(j+1)] <- 0
-              } else {
-                coveragecc[i,(j+1)] <- cor(population$FreqSel, population$Freq)
-              }
-            }
-          }
           i <- i + 1
         }
       }
       coverage <- as.data.frame(coverage)
       rownames(coverage) <- size.range
       colnames(coverage) <- c("Size",colnames(data))
-
-      coveragecc <- as.data.frame(coveragecc)
-      rownames(coveragecc) <- size.range
-      colnames(coveragecc) <- c("Size",colnames(data))
 
       selection <- as.data.frame(selection)
       rownames(selection) <- rownames(data)
@@ -485,7 +359,7 @@ sampleSizeTest <- function(
       if(is.null(prime.factor)){
         prime.factor <- "NA"
       }
-      object@sample.size.test[[name]] <- createSampleSizeTestObject(prime.factor = prime.factor,coverage = coverage,selection = selection, coveragecc = coveragecc)
+      object@sample.size.test[[name]] <- createSampleSizeTestObject(prime.factor = prime.factor,coverage = coverage,selection = selection)
       return(object)
     } else {
       stop("Please provide a name for this test (e.g. test1)!")
@@ -621,11 +495,13 @@ sampling <- function(
           b <- floor(data[,j]*10)
 
           population <- as.data.frame(table(b))
+          population$b <- as.character(population$b)
           samples <- as.data.frame(table(a))
+          samples$a <- as.character(samples$a)
 
           tmp <- rep(0,dim(population)[1])
           for (k in 1:dim(samples)[1]) {
-            index <- which(population$Var1 == samples$Var1[k])
+            index <- which(population$b == samples$a[k])
             tmp[index] <- samples$Freq[k]
           }
           population$FreqSel <- tmp
