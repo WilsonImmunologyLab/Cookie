@@ -54,7 +54,7 @@ distCalculation <- function (
     if(length(num.index) > 0) {
       # numerical matrix
       data1 <- data[,num.index]
-      # bool and char matrix
+      # char matrix
       data2 <- data[,-num.index]
 
       dist.matrix1 <- hammingCodingCpp(data1)
@@ -76,7 +76,7 @@ distCalculation <- function (
 
 #' binaryCoding
 #'
-#' calculate binary distance for bool and char distance
+#' calculate binary distance for char distance
 #'
 #' @param data data matrix
 #'
@@ -115,7 +115,7 @@ binaryCoding <- function(
 
 #' hammingCoding
 #'
-#' calculate hamming distance for bool and char distance
+#' calculate hamming distance for num distance
 #'
 #' @param data data matrix
 #'
@@ -217,7 +217,7 @@ reductionUMAP <- function(
   method = "umap-learn",
   n.neighbors = 15,
   n.components = 2,
-  metric = "euclidean",
+  metric = "manhattan",
   verbose = TRUE,
   n.epochs = 200,
   min.dist = 0.1,

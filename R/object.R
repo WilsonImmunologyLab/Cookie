@@ -106,7 +106,7 @@ Sampling <- setClass(
 #' Create a Cookie object from a data frame
 #'
 #' @param data Data frame of raw data.
-#' @param factor.type Types of each factor. Can be "bool","char","num"
+#' @param factor.type Types of each factor. Can be "char","num"
 #'
 #' @importFrom utils packageVersion
 #' @export
@@ -122,15 +122,15 @@ createCookieObject <- function(
     }
 
     types <- unique(factor.type)
-    unrecognize <- setdiff(types, c("bool","char","num"))
+    unrecognize <- setdiff(types, c("char","num"))
     if(length(unrecognize) > 0) {
       cat("Unrecognized type!",unrecognize[1],"Please check you input!\n")
       stop()
     }
 
-    # convert data format to "character" for all bool and char factors to accelerate the distance calculation
+    # convert data format to "character" for all char factors to accelerate the distance calculation
     for (i in 1:length(factor.type)) {
-      if(factor.type[i] %in% c("bool","char")){
+      if(factor.type[i] %in% c("char")){
         data[,i] <- as.character(data[,i])
       } else {
         data[,i] <- as.numeric(data[,i])
