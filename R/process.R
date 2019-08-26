@@ -444,10 +444,18 @@ sampling <- function(
 
           if(length(diff) > 0) {
             for (var in diff) {
+              ### select sample with minimum average distance
+              # candidate.index <- which(data[,important] == var)
+              # a <- dist.matrix[candidate.index, index.a]
+              # a <- rowSums(a)
+              # sel.index <- which(a == min(a))
+              # sel.index <- candidate.index[sel.index]
+
+              # select sample with maximum local distance
               candidate.index <- which(data[,important] == var)
               a <- dist.matrix[candidate.index, index.a]
-              a <- rowSums(a)
-              sel.index <- which(a == min(a))
+              rowmins <- rowMins(a, value = TRUE)
+              sel.index <- which(rowmins == max(rowmins))[1]
               sel.index <- candidate.index[sel.index]
 
               # set selected marker
