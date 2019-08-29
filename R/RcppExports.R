@@ -5,8 +5,8 @@
 #'
 #' @param data data frame
 #' @export
-binaryCodingCpp <- function(data) {
-    .Call(`_Cookie_binaryCodingCpp`, data)
+binaryCodingCpp <- function(data, w) {
+    .Call(`_Cookie_binaryCodingCpp`, data, w)
 }
 
 #' hamming distance coding for numerical factors

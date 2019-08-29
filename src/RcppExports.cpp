@@ -6,13 +6,14 @@
 using namespace Rcpp;
 
 // binaryCodingCpp
-NumericMatrix binaryCodingCpp(DataFrame data);
-RcppExport SEXP _Cookie_binaryCodingCpp(SEXP dataSEXP) {
+NumericMatrix binaryCodingCpp(DataFrame data, NumericVector w);
+RcppExport SEXP _Cookie_binaryCodingCpp(SEXP dataSEXP, SEXP wSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< DataFrame >::type data(dataSEXP);
-    rcpp_result_gen = Rcpp::wrap(binaryCodingCpp(data));
+    Rcpp::traits::input_parameter< NumericVector >::type w(wSEXP);
+    rcpp_result_gen = Rcpp::wrap(binaryCodingCpp(data, w));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -29,7 +30,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_Cookie_binaryCodingCpp", (DL_FUNC) &_Cookie_binaryCodingCpp, 1},
+    {"_Cookie_binaryCodingCpp", (DL_FUNC) &_Cookie_binaryCodingCpp, 2},
     {"_Cookie_hammingCodingCpp", (DL_FUNC) &_Cookie_hammingCodingCpp, 1},
     {NULL, NULL, 0}
 };

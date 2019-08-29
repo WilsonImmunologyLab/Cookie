@@ -9,7 +9,7 @@ createCookieObject(data = NULL, factor.type = NULL)
 \arguments{
 \item{data}{Data frame of raw data.}
 
-\item{factor.type}{Types of each factor. Can be "bool","char","num"}
+\item{factor.type}{Types of each factor. Can be "char","num"}
 }
 \description{
 Create a Cookie object from a data frame

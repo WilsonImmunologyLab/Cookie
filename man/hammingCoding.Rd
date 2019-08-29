@@ -10,5 +10,5 @@ hammingCoding(data = NULL)
 \item{data}{data matrix}
 }
 \description{
-calculate hamming distance for bool and char distance
+calculate hamming distance for num distance
 }

@@ -10,5 +10,5 @@ binaryCoding(data = NULL)
 \item{data}{data matrix}
 }
 \description{
-calculate binary distance for bool and char distance
+calculate binary distance for char distance
 }

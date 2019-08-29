@@ -4,10 +4,12 @@
 \alias{distCalculation}
 \title{distCalculation}
 \usage{
-distCalculation(object = NULL)
+distCalculation(object = NULL, weight = NULL)
 }
 \arguments{
 \item{object}{Cookie object}
+
+\item{weight}{weight for each factor}
 }
 \description{
 calculate distance from normalized data

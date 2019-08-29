@@ -39,30 +39,45 @@ normalization <- function (
 #' calculate distance from normalized data
 #'
 #' @param object Cookie object
+#' @param weight weight for each factor
 #'
 #' @export
 #'
 #'
 
 distCalculation <- function (
-  object = NULL
+  object = NULL,
+  weight = NULL
 ) {
   if(!is.null(object)) {
     types <- object@factor.type
     num.index <- which(types == "num")
     data <- object@normalize.data
+    if(is.null(weight)){
+      weight <- rep(1,length(types))
+    } else {
+      if(length(types) != length(weight)) {
+        stop("Weights number should be equal to factor number!")
+      }
+    }
+
     if(length(num.index) > 0) {
       # numerical matrix
       data1 <- data[,num.index]
+      w1 <- weight[num.index]
+      for (i in 1:length(w1)) {
+        data1[,i] <- data1[,i]*w1[i]
+      }
       # char matrix
       data2 <- data[,-num.index]
+      w2 <- weight[-num.index]
 
       dist.matrix1 <- hammingCodingCpp(data1)
-      dist.matrix2 <- binaryCodingCpp(data2)
+      dist.matrix2 <- binaryCodingCpp(data2,w2)
 
       dist.matrix <- dist.matrix1 + dist.matrix2
     } else {
-      dist.matrix <- binaryCodingCpp(data)
+      dist.matrix <- binaryCodingCpp(data,weight)
     }
 
     object@dist.matrix <- dist.matrix

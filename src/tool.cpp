@@ -7,7 +7,7 @@ using namespace Rcpp;
 //' @param data data frame
 //' @export
 // [[Rcpp::export]]
-NumericMatrix binaryCodingCpp(DataFrame data) {
+NumericMatrix binaryCodingCpp(DataFrame data, NumericVector w) {
   int n = data.nrows();
   int m = data.length();
   NumericMatrix res(n,n);
@@ -26,7 +26,7 @@ NumericMatrix binaryCodingCpp(DataFrame data) {
         CharacterVector working_vec = data[k];
         if(working_vec[i] != "NA" && working_vec[j] != "NA") {
           if(working_vec[i] != working_vec[j]) {
-            vec_res++;
+            vec_res = vec_res + w[k];
           }
         }
       }
