@@ -5,7 +5,7 @@
 \title{sampleSizeTest}
 \usage{
 sampleSizeTest(object = NULL, prime.factor = NULL, size.range = NULL,
-  name = NULL)
+  name = NULL, fast.mode = FALSE)
 }
 \arguments{
 \item{object}{Cookie object}
@@ -15,6 +15,8 @@ sampleSizeTest(object = NULL, prime.factor = NULL, size.range = NULL,
 \item{size.range}{Sample size range}
 
 \item{name}{A name for this run. e.g. test1}
+
+\item{fast.mode}{A fast version of PAM algorithm in R package "cluster".By default is FALSE. Users can set this value to 3, 4, or 5 to use FastPAM (https://stat.ethz.ch/R-manual/R-patched/library/cluster/html/pam.html)}
 }
 \description{
 Run sample size test for current dataset

@@ -63,7 +63,7 @@ distCalculation <- function (
 
     if(length(num.index) > 0) {
       # numerical matrix
-      data1 <- data[,num.index]
+      data1 <- as.matrix(data[,num.index])
       w1 <- weight[num.index]
       for (i in 1:length(w1)) {
         data1[,i] <- data1[,i]*w1[i]
@@ -210,7 +210,7 @@ reductionTSNE <- function(
 #'
 #' @param object Cookie object
 #' @param seed see number. default is 42
-#' @param method could be "naive" or "umap-learn"
+#' @param method could be "naive" or "umap-learn". If choose "umap-learn", user may need to install python package umap-learn (https://pypi.org/project/umap-learn/)
 #' @param n.neighbors integer; number of nearest neighbors
 #' @param n.components  integer; dimension of target (output) space
 #' @param metric character or function; determines how distances between data points are computed. When using a string, available metrics are: euclidean, manhattan. Other available generalized metrics are: cosine, pearson, pearson2. Note the triangle inequality may not be satisfied by some generalized metrics, hence knn search may not be optimal. When using metric.function as a function, the signature must be function(matrix, origin, target) and should compute a distance between the origin column and the target columns
@@ -229,7 +229,7 @@ reductionTSNE <- function(
 reductionUMAP <- function(
   object,
   seed = 42,
-  method = "umap-learn",
+  method = "naive",
   n.neighbors = 15,
   n.components = 2,
   metric = "manhattan",
@@ -278,6 +278,7 @@ reductionUMAP <- function(
 #' @param prime.factor The unique prime factor.
 #' @param size.range Sample size range
 #' @param name A name for this run. e.g. test1
+#' @param fast.mode A fast version of PAM algorithm in R package "cluster".By default is FALSE. Users can set this value to 3, 4, or 5 to use FastPAM (https://stat.ethz.ch/R-manual/R-patched/library/cluster/html/pam.html)
 #'
 #' @importFrom cluster pam
 #'
@@ -288,7 +289,8 @@ sampleSizeTest <- function(
   object = NULL,
   prime.factor = NULL,
   size.range = NULL,
-  name = NULL
+  name = NULL,
+  fast.mode = FALSE
 ) {
   if(!is.null(object)){
     if(!is.null(name)) {
@@ -315,7 +317,7 @@ sampleSizeTest <- function(
               index <- which(data[,prime.factor] == subject)
               if(length(index) > n) {
                 sub.dist.matrix <- dist.matrix[index,index]
-                res <- pam(x = sub.dist.matrix, k = n, diss = TRUE)
+                res <- pam(x = sub.dist.matrix, k = n, diss = TRUE, pamonce = fast.mode)
 
                 orig.index <- index[res[["id.med"]]]
                 selection[orig.index,i] <- "Selected"
@@ -347,7 +349,7 @@ sampleSizeTest <- function(
         i = 1
         for (n in size.range) {
           cat("test sample size = ",n," for the entire population... \n")
-          res <- pam(x = dist.matrix, k = n, diss = TRUE)
+          res <- pam(x = dist.matrix, k = n, diss = TRUE, pamonce = fast.mode)
           selection[res[["id.med"]],i] <- "Selected"
 
           subset <- data[res[["id.med"]],]
@@ -395,8 +397,10 @@ sampleSizeTest <- function(
 #' @param important.factor the important factors
 #' @param sample.size Sample size
 #' @param name A name for this run. e.g. test1
+#' @param fast.mode A fast version of PAM algorithm in R package "cluster".By default is FALSE. Users can set this value to 3, 4, or 5 to use FastPAM (https://stat.ethz.ch/R-manual/R-patched/library/cluster/html/pam.html)
 #'
 #' @importFrom cluster pam
+#' @importFrom Rfast rowMins
 #'
 #' @export
 #'
@@ -406,7 +410,8 @@ sampling <- function(
   prime.factor = NULL,
   important.factor = NULL,
   sample.size = NULL,
-  name = NULL
+  name = NULL,
+  fast.mode = FALSE
 ) {
   if(!is.null(object)){
     if(!is.null(name)) {
@@ -430,7 +435,7 @@ sampling <- function(
             index <- which(data[,prime.factor] == subject)
             if(length(index) > sample.size) {
               sub.dist.matrix <- dist.matrix[index,index]
-              res <- pam(x = sub.dist.matrix, k = sample.size, diss = TRUE)
+              res <- pam(x = sub.dist.matrix, k = sample.size, diss = TRUE, pamonce = fast.mode)
 
               orig.index <- index[res[["id.med"]]]
               selection[orig.index,1] <- "Selected"
@@ -444,7 +449,7 @@ sampling <- function(
         }
       } else {
         # sampling from the entire population
-        res <- pam(x = dist.matrix, k = sample.size, diss = TRUE)
+        res <- pam(x = dist.matrix, k = sample.size, diss = TRUE, pamonce = fast.mode)
         selection[res[["id.med"]],1] <- "Selected"
       }
 

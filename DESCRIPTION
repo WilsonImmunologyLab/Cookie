@@ -18,6 +18,7 @@ Imports:
     ggradar,
     Rtsne,
     umap,
-    Rcpp
+    Rcpp,
+    Rfast
 LinkingTo: Rcpp
 RoxygenNote: 6.1.1

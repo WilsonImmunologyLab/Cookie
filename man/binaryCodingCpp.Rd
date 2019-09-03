@@ -4,7 +4,7 @@
 \alias{binaryCodingCpp}
 \title{binary (XOR) distance coding for char and bool factors}
 \usage{
-binaryCodingCpp(data)
+binaryCodingCpp(data, w)
 }
 \arguments{
 \item{data}{data frame}

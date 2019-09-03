@@ -5,7 +5,7 @@
 \title{sampling}
 \usage{
 sampling(object = NULL, prime.factor = NULL, important.factor = NULL,
-  sample.size = NULL, name = NULL)
+  sample.size = NULL, name = NULL, fast.mode = FALSE)
 }
 \arguments{
 \item{object}{Cookie object}
@@ -17,6 +17,8 @@ sampling(object = NULL, prime.factor = NULL, important.factor = NULL,
 \item{sample.size}{Sample size}
 
 \item{name}{A name for this run. e.g. test1}
+
+\item{fast.mode}{A fast version of PAM algorithm in R package "cluster".By default is FALSE. Users can set this value to 3, 4, or 5 to use FastPAM (https://stat.ethz.ch/R-manual/R-patched/library/cluster/html/pam.html)}
 }
 \description{
 Sampling from current dataset

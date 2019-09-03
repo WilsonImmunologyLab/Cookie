@@ -4,18 +4,17 @@
 \alias{reductionUMAP}
 \title{reductionUMAP}
 \usage{
-reductionUMAP(object, seed = 42, method = "umap-learn",
-  n.neighbors = 15, n.components = 2, metric = "manhattan",
-  verbose = TRUE, n.epochs = 200, min.dist = 0.1, spread = 1,
-  set.op.mix.ratio = 1, local.connectivity = 1L,
-  negative.sample.rate = 5L)
+reductionUMAP(object, seed = 42, method = "naive", n.neighbors = 15,
+  n.components = 2, metric = "manhattan", verbose = TRUE,
+  n.epochs = 200, min.dist = 0.1, spread = 1, set.op.mix.ratio = 1,
+  local.connectivity = 1L, negative.sample.rate = 5L)
 }
 \arguments{
 \item{object}{Cookie object}
 
 \item{seed}{see number. default is 42}
 
-\item{method}{could be "naive" or "umap-learn"}
+\item{method}{could be "naive" or "umap-learn". If choose "umap-learn", user may need to install python package umap-learn (https://pypi.org/project/umap-learn/)}
 
 \item{n.neighbors}{integer; number of nearest neighbors}
 
