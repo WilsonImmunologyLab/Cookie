@@ -1,12 +1,11 @@
 Package: Cookie
 Type: Package
-Title: An unbiased sampling method to select representative samples from large population
-Version: 0.1.0
+Title: An sampling method to select representative samples from large population
+Version: 1.0.0
 Authors@R: c(
   person(given = 'Lei', family = 'Li', email = 'leil@uchicago.edu', role = c('aut', 'cre'))
   )
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: This method quantify relationship among samples as pairwise distances by comparing their given properties. Then samples will be selected by k-medoids clustering based on the pairwise distances. This method is also computationally efficient to determine the appropriate sample size that balance representativeness and cost. 
 License: GPL-3 | file LICENSE
 Encoding: UTF-8
 LazyData: true
