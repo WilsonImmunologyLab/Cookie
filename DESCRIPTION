@@ -1,24 +1,24 @@
 Package: Cookie
 Type: Package
-Title: An sampling method to select representative samples from large population
+Title: An sampling method to select representative samples from large
+        population
 Version: 1.0.0
 Authors@R: c(
   person(given = 'Lei', family = 'Li', email = 'leil@uchicago.edu', role = c('aut', 'cre'))
   )
 Description: This method quantify relationship among samples as pairwise distances by comparing their given properties. Then samples will be selected by k-medoids clustering based on the pairwise distances. This method is also computationally efficient to determine the appropriate sample size that balance representativeness and cost. 
-License: GPL-3 | file LICENSE
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends:
-    R (>= 3.4.0)
-Imports: 
-    ggplot2,
-    cluster,
-    reshape2,
-    ggradar,
-    Rtsne,
-    umap,
-    Rcpp,
-    Rfast
+Depends: R (>= 3.4.0)
+Imports: ggplot2, cluster, reshape2, Rtsne, umap, Rcpp, Rfast, ggradar,
+        remotes, methods
+Remotes: ricardo-bion/ggradar
 LinkingTo: Rcpp
 RoxygenNote: 6.1.1
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+NeedsCompilation: yes
+Packaged: 2019-09-06 15:37:59 UTC; lhuang
+Author: Lei Li [aut, cre]
+Maintainer: Lei Li <leil@uchicago.edu>
