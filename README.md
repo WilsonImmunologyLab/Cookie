@@ -1,5 +1,9 @@
+<p align="center">
+    <img src="/docs/img/logo.png"  width="150">
+</p>
+
 # Cookie
-<img src="/docs/img/logo.png"  width="100">
+
 Cookie: Selecting representative samples from single cell atlas using k-medoids clustering. 
 Please refer to https://WilsonImmunologyLab.github.io/Cookie/ for installation instruction and tutorial
 
